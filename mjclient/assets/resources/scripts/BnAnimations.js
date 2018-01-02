@@ -8,8 +8,6 @@
 //  - [Chinese] http://www.cocos.com/docs/creator/scripting/life-cycle-callbacks.html
 //  - [English] http://www.cocos2d-x.org/docs/editors_and_tools/creator-chapters/scripting/life-cycle-callbacks/index.html
 
-var AutoReconnectWsRpcClient = require("AutoReconnectWsRpcClient")
-
 cc.Class({
     extends: cc.Component,
 
@@ -29,20 +27,39 @@ cc.Class({
         //         this._bar = value;
         //     }
         // },
+        //
+        inAnimationClip: cc.AnimationClip,//定义动画片段的节点属性
+        outAnimationClip: cc.AnimationClip,
     },
 
     // LIFE-CYCLE CALLBACKS:
 
-    // onLoad () {},
+    onLoad: function () {
+        var animation = this.node.addComponent(cc.Animation);//添加组件的方式返回一个实例
+        animation.addClip(this.inAnimationClip,"in");//获得该对象实例上的具体内容（动画剪辑）并重命名
+        animation.addClip(this.outAnimationClip,"out");
+        //添加事件
+        this.node.on(cc.Node.EventType.TOUCH_START, function (args) {
+          //  cc.log(args);查看一下输出
+            animation.play("in");//写回调函数的方法
+        }, this.node);
+        this.node.on(cc.Node.EventType.TOUCH_END, function () {
+            animation.play("out");
+
+        }, this.node);
+        this.node.on(cc.Node.EventType.TOUCH_CANCEL, function () {
+            animation.play("out");
+
+        }, this.node);
+
+
+
+    },
 
     start () {
-        var client = new AutoReconnectWsRpcClient();
-        client.connect("ws://127.0.0.1:36502");
-        client.onReady(function (data) {
-            client.proxy.hello("sdfdsf",function () {
-                
-            })
-        })
+
+
+
     },
 
     // update (dt) {},
